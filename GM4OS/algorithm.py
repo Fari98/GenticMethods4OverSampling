@@ -3,17 +3,17 @@ import random
 
 import torch
 
-from gp4os.base.population import Population
+from GM4OS.base.population import Population
 import numpy as np
-from gp4os.utils.utils_info import logger, verbose_reporter
-from gp4os.base.individual import Individual
-from gp4os.utils.utils_tree import tree_pruning, tree_depth
+from GM4OS.utils.utils_info import logger, verbose_reporter
+from GM4OS.base.individual import Individual
+from GM4OS.utils.utils_tree import tree_pruning, tree_depth
 from sklearn.metrics import classification_report
 import pandas as pd
 
 
 
-class GP4OS(): #MAXIMIZATION
+class GM4OS(): #MAXIMIZATION
 
     """
         Genetic Programming for Optimization and Search (GP4OS) class.

@@ -1,6 +1,6 @@
 import numpy as np
 import random
-from gp4os.utils.utils_tree import create_grow_random_tree, substitute_subtree, random_subtree
+from GM4OS.utils.utils_tree import create_grow_random_tree, substitute_subtree, random_subtree
 
 # Function to perform mutation on a tree.
 def mutate_tree_node(max_depth, TERMINALS, CONSTANTS, FUNCTIONS, p_c = 0.1):

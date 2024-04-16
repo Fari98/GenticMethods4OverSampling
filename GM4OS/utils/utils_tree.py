@@ -1,7 +1,7 @@
 import random
 import numpy as np
-from gp4os.utils.utils import flatten
-# from gp4os.utils.functions import TERMINALS
+from GM4OS.utils.utils import flatten
+# from GM4OS.utils.functions import TERMINALS
 
 # Function to create a random grow tree.
 def create_grow_random_tree(depth, FUNCTIONS, TERMINALS, CONSTANTS, p_c = 0.1, p_t = 0.5,  first_call=True):

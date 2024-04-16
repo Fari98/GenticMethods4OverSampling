@@ -1,4 +1,4 @@
-from gp4os.utils.utils import bound_value
+from GM4OS.utils.utils import bound_value
 
 class Tree():
     """

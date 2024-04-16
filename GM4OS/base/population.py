@@ -1,4 +1,4 @@
-from gp4os.utils.utils import flatten
+from GM4OS.utils.utils import flatten
 
 class Population():
 

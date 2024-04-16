@@ -1,4 +1,4 @@
-from gp4os.utils.utils_tree import random_subtree, substitute_subtree
+from GM4OS.utils.utils_tree import random_subtree, substitute_subtree
 
 # Function to perform crossover between two trees.
 def crossover_trees(FUNCTIONS):

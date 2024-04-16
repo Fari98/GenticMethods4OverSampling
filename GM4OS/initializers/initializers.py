@@ -1,8 +1,8 @@
-from gp4os.utils.utils_tree import create_grow_random_tree, create_full_random_tree
-from gp4os.utils.utils_input_set import create_random_input_set
-from gp4os.base.individual import Individual
-# from gp4os.base.tree import Tree
-# from gp4os.base.input_set import Input_Set
+from GM4OS.utils.utils_tree import create_grow_random_tree, create_full_random_tree
+from GM4OS.utils.utils_input_set import create_random_input_set
+from GM4OS.base.individual import Individual
+# from GM4OS.base.tree import Tree
+# from GM4OS.base.input_set import Input_Set
 
 def grow(size, depth, FUNCTIONS, TERMINALS, CONSTANTS, input_set_size, umbalanced_obs_ind, p_c = 0.1):
     """

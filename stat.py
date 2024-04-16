@@ -1,27 +1,29 @@
-from gp4os.initializers.initializers import rhh
-from gp4os.utils.functions import TERMINALS, FUNCTIONS, CONSTANTS
-from gp4os.base.population import Population
+from GM4OS.initializers.initializers import rhh
+from GM4OS.utils.functions import TERMINALS, FUNCTIONS, CONSTANTS
+from GM4OS.base.population import Population
 import pandas as pd
-# from gp4os.utils.utils import train_test_split
-from gp4os.utils.functions import TERMINALS, FUNCTIONS, CONSTANTS, oversampling_log, Baseline
+# from GM4OS.utils.utils import train_test_split
+from GM4OS.utils.functions import TERMINALS, FUNCTIONS, CONSTANTS, oversampling_log, Baseline
 import torch
 import warnings
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import f1_score, classification_report, roc_auc_score, recall_score, accuracy_score, precision_score
 from imblearn.metrics import geometric_mean_score
-from gp4os.algorithm import GP4OS
-from gp4os.utils.selection_algorithms import tournament_selection
-from gp4os.operators_tree.crossover_operators import crossover_trees
-from gp4os.operators_input_set.crossover_operators import crossover_input_set
-from gp4os.operators_tree.mutators import mutate_tree_node, mutate_tree_subtree
-from gp4os.operators_input_set.mutators import mutate_input_set
+from GM4OS.algorithm import GM4OS
+from GM4OS.utils.selection_algorithms import tournament_selection
+from GM4OS.operators_tree.crossover_operators import crossover_trees
+from GM4OS.operators_input_set.crossover_operators import crossover_input_set
+from GM4OS.operators_tree.mutators import mutate_tree_node, mutate_tree_subtree
+from GM4OS.operators_input_set.mutators import mutate_input_set
 from imblearn.over_sampling import SMOTE
 from sklearn.base import clone
 import os
 import csv
 from imblearn.over_sampling import SMOTE, BorderlineSMOTE, ADASYN, SVMSMOTE
 # from gsmote import GeometricSMOTE
+from catboost import CatBoostClassifier
+from xgboost import XGBClassifier
 from tqdm import tqdm, trange
 
 def main():
@@ -43,7 +45,24 @@ def main():
     metrics = [w_f1_score, w_recall, w_precision, w_gscore, accuracy_score]
     metrics_names = ['f1_score', 'recall', 'precision', 'g_score', 'accuracy']
 
-    estimator = LogisticRegression()
+    # estimator = CatBoostClassifier(loss_function='Logloss',
+    #                            verbose=False)
+    # estimator.__name__ = 'CatBoostClassifier'
+
+    estimator = XGBClassifier()
+    estimator.__name__ = 'XGBClassifier'
+
+    parameters ={'flare': {'gamma': 1.6, 'learning_rate': 0.6, 'max_depth': 7, 'n_estimators': 50, 'reg_alpha': 0.1, 'reg_lambda': 0.4},
+                 'haberman': {'gamma': 3.2, 'learning_rate': 0.7, 'max_depth': 5, 'n_estimators': 50, 'reg_alpha': 0.1, 'reg_lambda': 1.6},
+                 'spect': {'gamma': 0, 'learning_rate': 0.06, 'max_depth': 5, 'n_estimators': 50, 'reg_alpha': 0.1, 'reg_lambda': 0.1},
+                 'ionosphere': {'gamma': 0.1, 'learning_rate': 0.6, 'max_depth': 5, 'n_estimators': 50, 'reg_alpha': 0, 'reg_lambda': 3.2},
+                 'spectf': {'gamma': 0, 'learning_rate': 0.3, 'max_depth': 7, 'n_estimators': 50, 'reg_alpha': 3.2, 'reg_lambda': 1.6},
+                 'hungarian': {'gamma': 0, 'learning_rate': 0.7, 'max_depth': 7, 'n_estimators': 50, 'reg_alpha': 1.6, 'reg_lambda': 0.4},
+                 'diabetes': {'gamma': 0.4, 'learning_rate': 0.7, 'max_depth': 5, 'n_estimators': 50, 'reg_alpha': 3.2, 'reg_lambda': 1.6},
+                 'hepatitis': {'gamma': 0, 'learning_rate': 0.6, 'max_depth': 5, 'n_estimators': 50, 'reg_alpha': 0, 'reg_lambda': 1.6},
+                 'appendicitis': {'gamma': 1.6, 'learning_rate': 0.3, 'max_depth': 5, 'n_estimators': 50, 'reg_alpha': 0.1, 'reg_lambda': 0.1},
+                 'analcatdata_lawsuit': {'gamma': 0, 'learning_rate': 0.06, 'max_depth': 5, 'n_estimators': 50, 'reg_alpha': 0, 'reg_lambda': 0}}
+
 
 
     for i in trange(len(metrics)):
@@ -60,6 +79,7 @@ def main():
             else:
                 data = pd.read_csv(f"../data/{data_name}.tsv",
                              sep='\t')
+
             X = torch.from_numpy(data.values[:,:-1]).float()
             y = torch.from_numpy(data.values[:,-1]).int()
 
@@ -68,30 +88,32 @@ def main():
                 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.4, shuffle=True, stratify=y,
                                                                     random_state=_)
 
+                # baseline_log_path = '../log/baseline_bin_w_sota.csv'
+
                 # oversampling_log(oversampler = SMOTE(), model = estimator,
                 #                      X_train = X_train, y_train = y_train, X_test = X_test, y_test = y_test,
-                #                      name = 'SMOTE', data_file = data_name, iteration=_, path='../log/baseline_bin.csv',
+                #                      name = 'SMOTE', data_file = data_name, iteration=_, path=baseline_log_path,
                 #                      verbose=1)
                 #
                 #
                 # oversampling_log(oversampler = Baseline(), model = estimator,
                 #                      X_train = X_train, y_train = y_train, X_test = X_test, y_test = y_test,
-                #                      name = 'LR', data_file = data_name, iteration=_, path='../log/baseline_bin.csv',
+                #                      name = 'LR', data_file = data_name, iteration=_, path=baseline_log_path,
                 #                      verbose=1)
                 #
                 # oversampling_log(oversampler = BorderlineSMOTE(), model = estimator,
                 #                      X_train = X_train, y_train = y_train, X_test = X_test, y_test = y_test,
-                #                      name = 'BSMOTE', data_file = data_name, iteration=_, path='../log/baseline_bin.csv',
+                #                      name = 'BSMOTE', data_file = data_name, iteration=_, path=baseline_log_path,
                 #                      verbose=1)
                 #
                 # oversampling_log(oversampler = ADASYN(sampling_strategy='minority'), model = estimator,
                 #                  X_train = X_train, y_train = y_train, X_test = X_test, y_test = y_test,
-                #                  name = 'ADASYN', data_file = data_name, iteration=_, path='../log/baseline_bin.csv',
+                #                  name = 'ADASYN', data_file = data_name, iteration=_, path=baseline_log_path,
                 #                  verbose=1)
                 # try:
                 #     oversampling_log(oversampler = SVMSMOTE(), model = estimator,
                 #                      X_train = X_train, y_train = y_train, X_test = X_test, y_test = y_test,
-                #                      name = 'SVMSMOTE', data_file = data_name, iteration=_, path='../log/baseline_bin.csv',
+                #                      name = 'SVMSMOTE', data_file = data_name, iteration=_, path=baseline_log_path,
                 #                      verbose=1)
                 # except:
                 #     print('SVMSMOTE: FAILED')
@@ -99,7 +121,7 @@ def main():
                 #
                 # oversampling_log(oversampler = GeometricSMOTE(), model = estimator,
                 #                  X_train = X_train, y_train = y_train, X_test = X_test, y_test = y_test,
-                #                  name = 'GSMOTE', data_file = data_name, iteration=_, path='../log/baseline_bin.csv',
+                #                  name = 'GSMOTE', data_file = data_name, iteration=_, path=baseline_log_path,
                 #                  verbose=1)
 
 
@@ -138,7 +160,7 @@ def main():
                       'y_test':y_test,
                       'error_measure':metrics[i]}
 
-                solver = GP4OS(   pi_eval = pi_eval,
+                solver = GM4OS(   pi_eval = pi_eval,
                                   pi_init = pi_init,
                                   pi_test = pi_test,
                                   initializer = rhh,
@@ -159,8 +181,8 @@ def main():
                               log = 1,
                               verbose = 1,
                               test_elite = True,
-                              log_path = '../log/gm4os_bin.csv',
-                              run_info = [f'GP4OS_{metrics_names[i]}', _, data_name],
+                              log_path = '../log/gm4os_bin_w_sota.csv',
+                              run_info = [f'GM4OS_{metrics_names[i]}', _, data_name],
                               max_depth=17,
                               deep_log = False)
 

@@ -1,9 +1,10 @@
 import torch
-from gp4os.base.tree import Tree
-from gp4os.base.input_set import Input_Set
+from GM4OS.base.tree import Tree
+from GM4OS.base.input_set import Input_Set
 # from sklearn.base import clone
 from sklearn.metrics import recall_score, precision_score, f1_score, accuracy_score
 from imblearn.metrics import geometric_mean_score
+from catboost import  Pool
 
 class Individual():
     """
@@ -85,9 +86,13 @@ class Individual():
             new_train_set = torch.concatenate((X_train, oversampling), axis = 0)
 
             # base_model = clone(base_model)
-
-            base_model.fit(new_train_set, y_train_extended)
-            self.predictions = torch.tensor(base_model.predict(X_test)).float()
+            if base_model.__name__ == 'CatBoostClassifier':
+                train_pool = Pool(new_train_set.numpy(), y_train_extended.numpy())
+                base_model.fit(train_pool)
+                self.predictions = torch.from_numpy(base_model.predict(X_test.numpy())).int()
+            else:
+                base_model.fit(new_train_set, y_train_extended)
+                self.predictions = base_model.predict(X_test)
 
             self.fitness = error_measure(y_test, self.predictions)
 
@@ -144,19 +149,22 @@ class Individual():
         new_train_set = torch.concatenate((X_train, oversampling), axis = 0)
 
         # base_model = clone(base_model)
-        base_model.fit(new_train_set, y_train_extended)
-        predictions = base_model.predict(X_test)
+        if base_model.__name__ == 'CatBoostClassifier':
+            train_pool = Pool(new_train_set.numpy(), y_train_extended.numpy())
+            base_model.fit(train_pool)
+            self.test_pred = torch.from_numpy(base_model.predict(X_test.numpy())).int()
+        else:
+            base_model.fit(new_train_set, y_train_extended)
+            self.test_pred = base_model.predict(X_test)
 
-        self.test_pred = predictions
-
-        self.test_fitness = error_measure(y_test, predictions)
+        self.test_fitness = error_measure(y_test, self.test_pred)
 
 
-        self.f1_score_test = f1_score(y_test, predictions, average='weighted')
-        self.recall_test = recall_score(y_test, predictions, average='weighted')
-        self.precision_test = precision_score(y_test, predictions, average='weighted')
-        self.gscore_test = geometric_mean_score(y_test, predictions, average='weighted')
-        self.accuracy_test = accuracy_score(y_test, predictions)
+        self.f1_score_test = f1_score(y_test, self.test_pred, average='weighted')
+        self.recall_test = recall_score(y_test, self.test_pred, average='weighted')
+        self.precision_test = precision_score(y_test, self.test_pred, average='weighted')
+        self.gscore_test = geometric_mean_score(y_test, self.test_pred, average='weighted')
+        self.accuracy_test = accuracy_score(y_test, self.test_pred)
 
         # self.metrics_test = [self.f1_score_test, self.recall_test, self.precision_test, self.gscore_test, self.accuracy_test]
 
