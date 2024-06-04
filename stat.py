@@ -22,7 +22,7 @@ import os
 import csv
 from imblearn.over_sampling import SMOTE, BorderlineSMOTE, ADASYN, SVMSMOTE
 # from gsmote import GeometricSMOTE
-from catboost import CatBoostClassifier
+# from catboost import CatBoostClassifier
 from xgboost import XGBClassifier
 from tqdm import tqdm, trange
 
@@ -43,14 +43,9 @@ def main():
          return geometric_mean_score(y_true, y_pred, average='weighted')
 
     metrics = [w_f1_score, w_recall, w_precision, w_gscore, accuracy_score]
-    metrics_names = ['f1_score', 'recall', 'precision', 'g_score', 'accuracy']
+    metrics_names = [ 'f1_score', 'recall', 'precision', 'g_score','accuracy']
 
-    # estimator = CatBoostClassifier(loss_function='Logloss',
-    #                            verbose=False)
-    # estimator.__name__ = 'CatBoostClassifier'
 
-    estimator = XGBClassifier()
-    estimator.__name__ = 'XGBClassifier'
 
     parameters ={'flare': {'gamma': 1.6, 'learning_rate': 0.6, 'max_depth': 7, 'n_estimators': 50, 'reg_alpha': 0.1, 'reg_lambda': 0.4},
                  'haberman': {'gamma': 3.2, 'learning_rate': 0.7, 'max_depth': 5, 'n_estimators': 50, 'reg_alpha': 0.1, 'reg_lambda': 1.6},
@@ -70,9 +65,19 @@ def main():
         # ['flare', 'haberman', 'spect', 'ionosphere', 'spectf', 'hungarian', 'diabetes', 'hepatitis',
          # 'appendicitis', 'analcatdata']
 
+        # if metrics[i] == 'recall':
+        #     datas = ['analcatdata_lawsuit']
+        #
+        # else:
+        datas = ['flare', 'haberman', 'spect', 'ionosphere', 'spectf', 'hungarian', 'diabetes', 'hepatitis',
+            'appendicitis', 'analcatdata_lawsuit']
 
-        for data_name in tqdm(['flare', 'haberman', 'spect', 'ionosphere', 'spectf', 'hungarian', 'diabetes', 'hepatitis',
-         'appendicitis', 'analcatdata_lawsuit']):
+
+
+        for data_name in tqdm(datas):
+
+            estimator = XGBClassifier(**parameters[data_name]) #
+            estimator.__name__ = 'XGBClassifier'
 
             if data_name == 'pima-indians-diabetes':
                 data = pd.read_csv('../data/pima-indians-diabetes.txt')
@@ -88,8 +93,8 @@ def main():
                 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.4, shuffle=True, stratify=y,
                                                                     random_state=_)
 
-                # baseline_log_path = '../log/baseline_bin_w_sota.csv'
-
+                # baseline_log_path = '../log/baseline_bin_s_sota.csv'
+                #
                 # oversampling_log(oversampler = SMOTE(), model = estimator,
                 #                      X_train = X_train, y_train = y_train, X_test = X_test, y_test = y_test,
                 #                      name = 'SMOTE', data_file = data_name, iteration=_, path=baseline_log_path,
@@ -178,15 +183,18 @@ def main():
 
                 solver.solve( n_iter=50,
                               elitism = True,
-                              log = 1,
+                              log = 0,
                               verbose = 1,
                               test_elite = True,
-                              log_path = '../log/gm4os_bin_w_sota.csv',
+                              log_path = '../log/gm4os_bin_s_sota.csv',
                               run_info = [f'GM4OS_{metrics_names[i]}', _, data_name],
                               max_depth=17,
                               deep_log = False)
 
-
+                with open('../log/solution_structure_s_sota.csv', 'a', newline='') as file:
+                    writer = csv.writer(file)
+                    writer.writerow(
+                        [f'GM4OS_{metrics_names[i]}', _, data_name, solver.elite.tree_repr_, solver.elite.input_choice_repr_])
 
 
 if __name__ == '__main__':

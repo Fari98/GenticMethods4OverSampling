@@ -159,7 +159,7 @@ class GM4OS(): #MAXIMIZATION
                                        self.elite.precision, self.elite.recall, self.elite.gscore, self.elite.f1_score,
                                        self.elite.precision_test, self.elite.recall_test,
                                        self.elite.gscore_test, self.elite.f1_score_test,
-                                       self.elite.accuracy_test], run_info = run_info)
+                                       self.elite.accuracy_test, self.elite.dist0, self.elite.dist1], run_info = run_info)
 
             else:
                 logger(log_path, 0, min(pop.fit), end - start, pop.nodes_count,
@@ -268,7 +268,7 @@ class GM4OS(): #MAXIMIZATION
                                        self.elite.precision, self.elite.recall, self.elite.gscore, self.elite.f1_score,
                                        self.elite.precision_test, self.elite.recall_test,
                                        self.elite.gscore_test, self.elite.f1_score_test,
-                                       self.elite.accuracy_test], run_info=run_info)
+                                       self.elite.accuracy_test, self.elite.dist0, self.elite.dist1], run_info=run_info)
                 else:
                     logger(log_path, it, min(pop.fit), end - start, pop.nodes_count,
                            pop_test_report=self.elite.test_fitness, run_info=run_info)

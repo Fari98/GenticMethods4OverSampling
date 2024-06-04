@@ -5,6 +5,7 @@ from GM4OS.base.input_set import Input_Set
 from sklearn.metrics import recall_score, precision_score, f1_score, accuracy_score
 from imblearn.metrics import geometric_mean_score
 from catboost import  Pool
+from GM4OS.utils.functions import dist
 
 class Individual():
     """
@@ -81,6 +82,9 @@ class Individual():
 
         # oversampling = torch.stack([self.tree.apply_tree(X_train[input_idx]) for input_idx in self.input_choice.repr_])
         oversampling = self.tree.apply_tree(X_train[self.input_choice.repr_])
+        self.dist0 = torch.median(dist(X_train[self.input_choice.repr_][:, 0], oversampling))
+        self.dist1 = torch.median(dist(X_train[self.input_choice.repr_][:, 1], oversampling))
+        #oversampling   X_train[self.input_choice.repr_]
 
         try:
             new_train_set = torch.concatenate((X_train, oversampling), axis = 0)

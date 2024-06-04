@@ -94,3 +94,6 @@ class Baseline():
 
         return X, y
 
+
+dist = torch.nn.PairwiseDistance()
+
