@@ -198,7 +198,7 @@ def main():
 
                             solver.solve( n_iter=50,
                                           elitism = True,
-                                          log = 0,
+                                          log = 1,
                                           verbose = 1,
                                           test_elite = True,
                                           log_path = f'../log/gm4os_{estimator_log_name}.csv',

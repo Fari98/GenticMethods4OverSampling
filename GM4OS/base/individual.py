@@ -82,8 +82,8 @@ class Individual():
 
         # oversampling = torch.stack([self.tree.apply_tree(X_train[input_idx]) for input_idx in self.input_choice.repr_])
         oversampling = self.tree.apply_tree(X_train[self.input_choice.repr_])
-        self.dist0 = torch.median(dist(X_train[self.input_choice.repr_][:, 0], oversampling))
-        self.dist1 = torch.median(dist(X_train[self.input_choice.repr_][:, 1], oversampling))
+        self.dist0 = float(torch.median(dist(X_train[self.input_choice.repr_][:, 0], oversampling)))
+        self.dist1 = float(torch.median(dist(X_train[self.input_choice.repr_][:, 1], oversampling)))
         #oversampling   X_train[self.input_choice.repr_]
 
         try:
