@@ -4,7 +4,7 @@ from GM4OS.base.input_set import Input_Set
 # from sklearn.base import clone
 from sklearn.metrics import recall_score, precision_score, f1_score, accuracy_score
 from imblearn.metrics import geometric_mean_score
-from catboost import  Pool
+from catboost import Pool
 from GM4OS.utils.functions import dist
 
 class Individual():
